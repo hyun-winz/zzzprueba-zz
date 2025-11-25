@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>ccd</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet"/>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { 
+      background: #141414; 
+      color: #fff; 
+      font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; 
+      padding: 40px 4%; 
+    }
+    h1 { font-size: 3rem; margin-bottom: 30px; text-align:center; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+    }
+    .card {
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .card:hover { transform: scale(1.08); box-shadow: 0 0 30px rgba(229,9,20,0.8); }
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .title {
+      padding: 15px;
+      background: #000;
+      text-align: center;
+      font-size: 1.3rem;
+    }
+
+    /* Modal fullscreen */
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #000;
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    #modal.active { display: flex; }
+    .close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 50px;
+      color: #fff;
+      cursor: pointer;
+      z-index: 10000;
+    }
+    @media (max-width:768px) {
+      h1 { font-size: 2rem; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ccd</h1>
+
+  <div class="grid">
+
+    <!-- VIDEO 1 -->
+    <div class="card" onclick="abrir('Video 1', 'https://vz-23358664-81c.b-cdn.net/fcc1caa4-cb93-479a-b435-f7bdd93c3f5e/playlist.m3u8', 'https://vz-23358664-81c.b-cdn.net/fcc1caa4-cb93-479a-b435-f7bdd93c3f5e/thumbnail.jpg')">
+      <img src="https://vz-23358664-81c.b-cdn.net/fcc1caa4-cb93-479a-b435-f7bdd93c3f5e/thumbnail.jpg" alt="Video 1">
+      <div class="title">Video 1 - Título aquí</div>
+    </div>
+
+    <!-- VIDEO 2 - CAMBIA ESTOS DATOS -->
+    <div class="card" onclick="abrir('Video 2', 'https://vz-XXXX.b-cdn.net/TU-ID-AQUI/playlist.m3u8', 'https://vz-XXXX.b-cdn.net/TU-ID-AQUI/thumbnail.jpg')">
+      <img src="https://via.placeholder.com/600x900/333/fff?text=Video+2" alt="Video 2">
+      <div class="title">Video 2 - Pon tu título</div>
+    </div>
+
+    <!-- VIDEO 3 -->
+    <div class="card" onclick="abrir('Video 3', 'https://vz-XXXX.b-cdn.net/OTRO-ID/playlist.m3u8', 'https://via.placeholder.com/600x900/222/fff?text=Video+3')">
+      <img src="https://via.placeholder.com/600x900/222/fff?text=Video+3" alt="Video 3">
+      <div class="title">Video 3</div>
+    </div>
+
+    <!-- Añade tantos como quieras copiando el bloque de arriba -->
+
+  </div>
+
+  <!-- Modal del reproductor -->
+  <div id="modal">
+    <div class="close" onclick="cerrar()">&times;</div>
+    <video id="player" class="video-js vjs-fluid" controls preload="auto" playsinline></video>
+  </div>
+
+  <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    let player;
+
+    function abrir(titulo, url, poster) {
+      document.getElementById('modal').classList.add('active');
+      document.title = titulo + " - Frizax TV";
+
+      if (player) player.dispose();
+      document.getElementById('player').innerHTML = '';
+
+      player = videojs('player', {
+        fluid: true,
+        responsive: true,
+        poster: poster
+      });
+
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(player.tech_.el_);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => player.play());
+      } else {
+        player.src({ src: url, type: 'application/x-mpegURL' });
+      }
+    }
+
+    function cerrar() {
+      document.getElementById('modal').classList.remove('active');
+      if (player) player.pause();
+      document.title = "Frizax TV";
+    }
+
+    // Cerrar con tecla ESC
+    document.addEventListener('keydown', e => { if(e.key === "Escape") cerrar(); });
+  </script>
+</body>
+</html>
